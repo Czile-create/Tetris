@@ -1,6 +1,11 @@
 # Tetris
-A C++ Tetris for Windows
+A C++ Tetris for Windows  
 For those who cannot compile C++ files, see our [release files](https://github.com/Czile-create/Tetris/releases)
+
+## Pics
+(https://github.com/Czile-create/Tetris/tree/master/TetrisPics/1.png)  
+(https://github.com/Czile-create/Tetris/tree/master/TetrisPics/2.png)  
+(https://github.com/Czile-create/Tetris/tree/master/TetrisPics/3.png)  
 
 ## How to use?
 ```
@@ -17,4 +22,5 @@ How to control the tetris?
 >       When you type 'q': to quit the game.
 ```
 
-## Pics
+## License
+See the file License.

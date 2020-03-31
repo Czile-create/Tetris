@@ -3,9 +3,9 @@ A C++ Tetris for Windows
 For those who cannot compile C++ files, see our [release files](https://github.com/Czile-create/Tetris/releases)
 
 ## Pics
-![Image text](https://github.com/Czile-create/Tetris/tree/master/TetrisPics/1.png)  
-![Image text](https://github.com/Czile-create/Tetris/tree/master/TetrisPics/2.png)  
-![Image text](https://github.com/Czile-create/Tetris/tree/master/TetrisPics/3.png)  
+![Cover](https://github.com/Czile-create/Tetris/tree/master/TetrisPics/1.png)  
+![Game](https://github.com/Czile-create/Tetris/tree/master/TetrisPics/2.png)  
+![Game Over](https://github.com/Czile-create/Tetris/tree/master/TetrisPics/3.png)  
 
 ## How to use?
 ```

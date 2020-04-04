@@ -1,6 +1,6 @@
-/* 
- * Copyright (c) Purelight. Chan Zee Lok
- * 2020 - 03 - 31
+/*
+ * Copyright (c) 2020 Purelight.Chan Zee Lok.
+ * Latest Update: 2020 - 04 - 05
  */
 
 
@@ -48,17 +48,18 @@ void hide()
 void show()
 {
     CONSOLE_CURSOR_INFO cursor_info = {1, 1};
-    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor_info);    //显示光标    
+    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor_info);    //显示光标
 }
 
 class set {
     public:
         set()
         {
-            updateGap=20;
+            updateGap=200;
             LargestPoint=0;
             n=30;
             m=15;
+            LastPoint=0;
         }
         set & operator=(const set & t)
         {
@@ -66,6 +67,7 @@ class set {
             LargestPoint=t.LargestPoint;
             n=t.n;
             m=t.m;
+            LastPoint=t.LastPoint;
             return *this;
         }
         void readSetting();
@@ -74,7 +76,7 @@ class set {
         void showSetting();
         int culculateVerify();
         int updateGap, n, m, Verify;
-        double LargestPoint;
+        double LargestPoint, LastPoint;
         mutex mtx;
 } Setting;
 
@@ -89,7 +91,7 @@ class map {
         void init();
         bool v[100][100];
         void printinmap(cube *);
-        void check();
+        void check(cube *);
         int n,m;
         bool live;
         mutex mtx;
@@ -108,7 +110,6 @@ class cube {
                 y=rand()*rand()%Setting.m;
                 type1=rand()%7+1;
                 type2=rand()%6;
-                //cout<<x<<" "<<y<<' '<<type1<<' '<<type2<<endl;
             } while (!cube(type1,type2,x,y).can());
             create();
         };
@@ -163,7 +164,7 @@ void set::readSetting()
 {
     FILE * fp=fopen("Tetris.set","r");
     if (fp!=NULL) {
-        fscanf(fp,"%d%d%d%lf%d",&n,&m,&updateGap,&LargestPoint,&Verify);
+        fscanf(fp,"%d%d%d%lf%lf%d",&n,&m,&updateGap,&LargestPoint,&LastPoint,&Verify);
         if (culculateVerify()!=Verify)
             *this=set();
     }
@@ -171,12 +172,13 @@ void set::readSetting()
 }
 void set::showSetting()
 {
-    cout<<"Here are your settings:\n\tLine:\t\t"<<n<<"\n\tList:\t\t"<<m<<"\n\tUpdateGap:\t"<<updateGap<<"\n\n>";
+    cout<<"Here are your settings:\n\tLine:\t\t"<<n<<"\n\tList:\t\t"<<m<<"\n\tUpdateGap:\t"<<updateGap<<"\n\n";
+    cout<<"Here are your honors:\n\tHighest Point:\t"<<LargestPoint<<"\n\tLatest Point:\t"<<LastPoint<<"\n\n>";
 }
 void set::saveSetting()
 {
     FILE * fp=fopen("Tetris.set","w+");
-    fprintf(fp, "%d %d %d %lf %d",n,m,updateGap,LargestPoint, culculateVerify());
+    fprintf(fp, "%d %d %d %lf %lf %d",n,m,updateGap,LargestPoint,LastPoint,culculateVerify());
     fclose(fp);
 }
 
@@ -211,9 +213,8 @@ void set::changeSetting()
             else
                 updateGap=temp;
         }
-        else if (s=="save") {
+        else if (s=="save")
             cout<<"\n\n>";
-        }
         else
             cout<<"Command NOT Found! Please try again.\n";
         saveSetting();
@@ -222,7 +223,7 @@ void set::changeSetting()
 
 int set::culculateVerify()
 {
-    return (n*m^updateGap)%127;
+    return ((n*m^updateGap)|(unsigned(LargestPoint)&unsigned(LastPoint)))%1127;
 }
 map::map() {}
 void map::init()
@@ -247,34 +248,37 @@ void map::init()
             v[i][j]=0;
     score=0;
     live=1;
-    multi=exp(1);
+    multi=1.35;
 }
 void map::printinmap(cube * t)
 {
     lock_guard<mutex> guard(mtx);
     for (int i=0; i<4; i++)
         v[t->p[i].x][t->p[i].y]=1;
-    check();
+    check(t);
 }
 
-void map::check()
+void map::check(cube * t)
 {
     score++;
-    for (int i=0; i<n; i++) {
-        int sum=0;
+    int sum;
+    for (int q=0; q<4; q++) {
+        sum=0;
+        int i=t->p[q].x;
         for (int j=0; j<m; j++)
             sum+=v[i][j];
         if (sum==m) {
-            multi*=exp(1);
-            for (int k=i; k>1; k--)
+            multi*=1.35;
+            for (int k=i; k>0; k--)
                 for (int l=0; l<m; l++) {
                     v[k][l]=v[k-1][l];
                     gotoxy(hOut1,k,l);
                     if (v[k][l])
-                        cout<<"\033[47m ";
+                        cout<<"\033[47m \033[0m";
                     else
                         cout<<"\033[0m ";
                 }
+            q=0;
         }
     }
     for (int i=0; i<4; i++)
@@ -282,7 +286,8 @@ void map::check()
             if (v[i][j])
                 live=0;
 }
-double map::culculatescore() {
+double map::culculatescore()
+{
     return
         score*multi*10000/Setting.n/Setting.m/Setting.updateGap;
 }
@@ -314,11 +319,11 @@ void cube::changePosition(int t)
         }
     }
     if (!cube(type1,type2,x+1,y).can()) {
-        mapping.printinmap(this);
         for (int i=0; i<4; i++) {
             gotoxy(hOut1,p[i].x,p[i].y);
             cout<<"\033[47m \033[0m";
         }
+        mapping.printinmap(this);
         if (mapping.live) {
             *this=cube();
             printinscreen();
@@ -499,7 +504,8 @@ void printfailed()
 {
     system("cls");
     if (mapping.culculatescore()>Setting.LargestPoint)
-    Setting.LargestPoint=mapping.culculatescore();
+        Setting.LargestPoint=mapping.culculatescore();
+    Setting.LastPoint=mapping.culculatescore();
     cout<<"Game Over!\nHigest score is:\t"<<Setting.LargestPoint<<"\nYour score is:\t\t"<<mapping.culculatescore();
     cout<<"\nPress any key to continue..\n\n>";
     Setting.saveSetting();
@@ -560,7 +566,7 @@ void shell()
         cin>>s;
         if (s=="start")
             start();
-        else if (s=="changeSetting"){
+        else if (s=="changeSetting") {
             Setting.changeSetting();
             cout<<"Tetris v1.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
         }
@@ -575,9 +581,8 @@ void shell()
         }
         else if (s=="exit")
             continue;
-        else {
+        else
             cout<<"NOT such command! type \033[1;46m'help'\033[0m for help!\n\n>";
-        }
     } while (s!="exit");
     Setting.saveSetting();
 }

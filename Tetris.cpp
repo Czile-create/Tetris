@@ -1,8 +1,7 @@
 /*
- * Copyright (c) 2020 Purelight.Chan Zee Lok.
+ * Copyright (c) Purelight.Chan Zee Lok.
  * Latest Update: 2020 - 04 - 05
  */
-
 
 #include <iostream>
 #include <thread>
@@ -14,6 +13,7 @@
 #include <math.h>
 #include <conio.h>
 #include <string>
+#include <iomanip>
 
 using namespace std;
 
@@ -248,7 +248,7 @@ void map::init()
             v[i][j]=0;
     score=0;
     live=1;
-    multi=1.35;
+    multi=1.23;
 }
 void map::printinmap(cube * t)
 {
@@ -268,7 +268,7 @@ void map::check(cube * t)
         for (int j=0; j<m; j++)
             sum+=v[i][j];
         if (sum==m) {
-            multi*=1.35;
+            multi*=1.23;
             for (int k=i; k>0; k--)
                 for (int l=0; l<m; l++) {
                     v[k][l]=v[k-1][l];
@@ -289,7 +289,7 @@ void map::check(cube * t)
 double map::culculatescore()
 {
     return
-        score*multi*10000/Setting.n/Setting.m/Setting.updateGap;
+        score*multi*1000/Setting.n/Setting.m/Setting.updateGap;
 }
 
 void cube::changePosition(int t)
@@ -506,13 +506,13 @@ void printfailed()
     if (mapping.culculatescore()>Setting.LargestPoint)
         Setting.LargestPoint=mapping.culculatescore();
     Setting.LastPoint=mapping.culculatescore();
-    cout<<"Game Over!\nHigest score is:\t"<<Setting.LargestPoint<<"\nYour score is:\t\t"<<mapping.culculatescore();
+    cout<<"Game Over!\nHigest score is:\t"<<setw(17)<<Setting.LargestPoint<<"\nYour score is:\t\t"<<setw(17)<<mapping.culculatescore();
     cout<<"\nPress any key to continue..\n\n>";
     Setting.saveSetting();
     show();
     _getch();
     system("cls");
-    cout<<"Tetris v1.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+    cout<<"Tetris v2.1\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
 }
 void start()
 {
@@ -561,19 +561,19 @@ void shell()
     system("mode con cols=52 lines=37");
     Setting.readSetting();
     string s;
-    cout<<"Tetris v1.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+    cout<<"Tetris v2.1\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
     do {
         cin>>s;
         if (s=="start")
             start();
         else if (s=="changeSetting") {
             Setting.changeSetting();
-            cout<<"Tetris v1.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+            cout<<"Tetris v2.1\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
         }
         else if (s=="showSetting")
             Setting.showSetting();
         else if (s=="about")
-            cout<<"Tetris v1.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+            cout<<"Tetris v2.1\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
         else if (s=="help") {
             cout<<"\nHere are commands you can use:\n>\tstart: To start the game.\n>\tshowSetting: To show Setting.\n";
             cout<<">\tchangeSetting: To change Setting.\n>\tabout: To show the info of author.\n>\texit: To exit the game\n\n";

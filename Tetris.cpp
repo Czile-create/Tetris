@@ -1,7 +1,7 @@
 /*
- * Copyright (c) Purelight.Chan Zee Lok.
- * Latest Update: 2020 - 04 - 05
- */
+    Copyright (c) Purelight.Chan Zee Lok.
+    Latest Update: 2020 - 04 - 07
+*/
 
 #include <iostream>
 #include <thread>
@@ -104,7 +104,7 @@ class cube {
     public:
         cube()
         {
-            srand(time(0));
+            srand(time(0)+mapping.score);
             do {
                 x=2;
                 y=rand()*rand()%Setting.m;
@@ -172,8 +172,7 @@ void set::readSetting()
 }
 void set::showSetting()
 {
-    cout<<"Here are your settings:\n\tLine:\t\t"<<n<<"\n\tList:\t\t"<<m<<"\n\tUpdateGap:\t"<<updateGap<<"\n\n";
-    cout<<"Here are your honors:\n\tHighest Point:\t"<<LargestPoint<<"\n\tLatest Point:\t"<<LastPoint<<"\n\n>";
+    cout<<"Here are your settings:\n\tLine:\t\t"<<n<<"\n\tList:\t\t"<<m<<"\n\tUpdateGap:\t"<<updateGap<<"\n\n>";
 }
 void set::saveSetting()
 {
@@ -232,16 +231,16 @@ void map::init()
     m=Setting.m;
     live=1;
     system("cls");
-    for (int i=0; i<m+2; i++)
+    for (int i=0; i<2*m+2; i++)
         cout<<"#";
     for (int i=0; i<n; i++) {
         gotoxy(hOut1,i,-1);
         cout<<"#";
-        gotoxy(hOut1,i,m);
+        gotoxy(hOut1,i,2*m);
         cout<<"#";
     }
     gotoxy(hOut1,n,-1);
-    for (int i=0; i<m+2; i++)
+    for (int i=0; i<2*m+2; i++)
         cout<<"#";
     for (int i=0; i<100; i++)
         for (int j=0; j<100; j++)
@@ -272,11 +271,11 @@ void map::check(cube * t)
             for (int k=i; k>0; k--)
                 for (int l=0; l<m; l++) {
                     v[k][l]=v[k-1][l];
-                    gotoxy(hOut1,k,l);
+                    gotoxy(hOut1,k,2*l);
                     if (v[k][l])
-                        cout<<"\033[47m \033[0m";
+                        cout<<"\033[47m  \033[0m";
                     else
-                        cout<<"\033[0m ";
+                        cout<<"\033[0m  ";
                 }
             q=0;
         }
@@ -320,8 +319,8 @@ void cube::changePosition(int t)
     }
     if (!cube(type1,type2,x+1,y).can()) {
         for (int i=0; i<4; i++) {
-            gotoxy(hOut1,p[i].x,p[i].y);
-            cout<<"\033[47m \033[0m";
+            gotoxy(hOut1,p[i].x,2*p[i].y);
+            cout<<"\033[47m  \033[0m";
         }
         mapping.printinmap(this);
         if (mapping.live) {
@@ -480,15 +479,35 @@ bool cube::can()
 void cube::moveinscreen()
 {
     for (int i=0; i<4; i++) {
-        gotoxy(hOut1,p[i].x,p[i].y);
-        cout<<"\033[0m ";
+        gotoxy(hOut1,p[i].x,p[i].y*2);
+        cout<<"\033[0m  ";
+    }
+        for (int i=1; i<mapping.n; i++) {
+        if (!cube(type1,type2,x+i,y).can()) {
+            cube temp(type1,type2,x+i-1,y);
+            for (int i=0; i<4; i++) {
+                gotoxy(hOut1,temp.p[i].x,temp.p[i].y*2);
+                cout<<"\033[0m  ";
+            }
+            break;
+        }
     }
 }
 void cube::printinscreen()
 {
     for (int i=0; i<4; i++) {
-        gotoxy(hOut1,p[i].x,p[i].y);
-        cout<<"\033[41m \033[0m";
+        gotoxy(hOut1,p[i].x,p[i].y*2);
+        cout<<"\033[41m  \033[0m";
+    }
+    for (int i=1; i<mapping.n; i++) {
+        if (!cube(type1,type2,x+i,y).can()) {
+            cube temp(type1,type2,x+i-1,y);
+            for (int i=0; i<4; i++) {
+                gotoxy(hOut1,temp.p[i].x,temp.p[i].y*2);
+                cout<<"\033[44m  \033[0m";
+            }
+            break;
+        }
     }
 }
 
@@ -512,7 +531,7 @@ void printfailed()
     show();
     _getch();
     system("cls");
-    cout<<"Tetris v2.1\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+    cout<<"Tetris v3.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
 }
 void start()
 {
@@ -549,6 +568,10 @@ void start()
             case 'q':
                 mapping.live=0;
                 break;
+            case '/':
+                while (cube(p.type1, p.type2, p.x+2, p.y).can())
+                    p.changePosition(3);
+                break;
             default :
                 break;
         }
@@ -558,26 +581,29 @@ void start()
 }
 void shell()
 {
-    system("mode con cols=52 lines=37");
+    system("mode con cols=102 lines=37");
     Setting.readSetting();
     string s;
-    cout<<"Tetris v2.1\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+    cout<<"Tetris v3.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
     do {
         cin>>s;
         if (s=="start")
             start();
         else if (s=="changeSetting") {
             Setting.changeSetting();
-            cout<<"Tetris v2.1\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+            cout<<"Tetris v3.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
         }
         else if (s=="showSetting")
             Setting.showSetting();
         else if (s=="about")
-            cout<<"Tetris v2.1\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+            cout<<"Tetris v3.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
         else if (s=="help") {
             cout<<"\nHere are commands you can use:\n>\tstart: To start the game.\n>\tshowSetting: To show Setting.\n";
-            cout<<">\tchangeSetting: To change Setting.\n>\tabout: To show the info of author.\n>\texit: To exit the game\n\n";
-            cout<<"How to control?\n>\tTo use the Function Key 'left' or 'right',\n>\tor space to control the Tetris\n>\t'q': to quit the game.\n\n>";
+            cout<<">\tchangeSetting: To change Setting.\n>\thonor: To show your honor.\n>\tabout: To show the info of author.\n>\texit: To exit the game\n\n";
+            cout<<"How to control?\n>\tTo use the Function Key 'left' or 'right',\n>\tor space to control the Tetris\n>\t'q': to quit the game.\n>\t'/': to draw the cube to the down.\n\n>";
+        }
+        else if (s=="honor") {
+            cout<<"Here are your honors:\n\tHighest Point:\t"<<Setting.LargestPoint<<"\n\tLatest Point:\t"<<Setting.LastPoint<<"\n\n>";
         }
         else if (s=="exit")
             continue;

@@ -2,12 +2,12 @@
 A C++ Tetris for Windows  
 For those who cannot compile C++ files, see our [release files](https://github.com/Czile-create/Tetris/releases)
 
-一个为Windows系统写的C++俄罗斯方块
+一个为Windows系统写的C++俄罗斯方块  
 对于那些未安装C++编译器的用户而言，参阅我们的[发行文件](https://github.com/Czile-create/Tetris/releases)
 
 ## Pics 部分图片
 
-> Pics follows may NOT screenshots of the latest version.
+> Pics follows may NOT screenshots of the latest version.  
 > 下列图片可能不是最新版本
 
 ![Cover](https://github.com/Czile-create/Tetris/tree/master/TetrisPics/1.png)  

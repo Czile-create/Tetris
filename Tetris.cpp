@@ -1,6 +1,6 @@
 /*
     Copyright (c) Purelight.Chan Zee Lok.
-    Latest Update: 2020 - 04 - 07
+    Latest Update: 2020 - 04 - 14
 */
 
 #include <iostream>
@@ -55,10 +55,10 @@ class set {
     public:
         set()
         {
-            updateGap=200;
+            updateGap=300;
             LargestPoint=0;
             n=30;
-            m=15;
+            m=10;
             LastPoint=0;
         }
         set & operator=(const set & t)
@@ -247,7 +247,7 @@ void map::init()
             v[i][j]=0;
     score=0;
     live=1;
-    multi=1.23;
+    multi=1;
 }
 void map::printinmap(cube * t)
 {
@@ -267,7 +267,7 @@ void map::check(cube * t)
         for (int j=0; j<m; j++)
             sum+=v[i][j];
         if (sum==m) {
-            multi*=1.23;
+            multi+=1;
             for (int k=i; k>0; k--)
                 for (int l=0; l<m; l++) {
                     v[k][l]=v[k-1][l];
@@ -277,7 +277,7 @@ void map::check(cube * t)
                     else
                         cout<<"\033[0m  ";
                 }
-            q=0;
+            q=-1;
         }
     }
     for (int i=0; i<4; i++)
@@ -288,7 +288,7 @@ void map::check(cube * t)
 double map::culculatescore()
 {
     return
-        score*multi*1000/Setting.n/Setting.m/Setting.updateGap;
+        (score+powf(1.1, multi))*10000/Setting.n/Setting.m/Setting.updateGap;
 }
 
 void cube::changePosition(int t)
@@ -495,6 +495,8 @@ void cube::moveinscreen()
 }
 void cube::printinscreen()
 {
+    gotoxy(hOut1, 36, -1);
+    cout<<"Current Score: "<<mapping.culculatescore();
     for (int i=0; i<4; i++) {
         gotoxy(hOut1,p[i].x,p[i].y*2);
         cout<<"\033[41m  \033[0m";
@@ -525,8 +527,10 @@ void printfailed()
     if (mapping.culculatescore()>Setting.LargestPoint)
         Setting.LargestPoint=mapping.culculatescore();
     Setting.LastPoint=mapping.culculatescore();
-    cout<<"Game Over!\nHigest score is:\t"<<setw(17)<<Setting.LargestPoint<<"\nYour score is:\t\t"<<setw(17)<<mapping.culculatescore();
-    cout<<"\nPress any key to continue..\n\n>";
+    cout.setf(ios_base::fixed,ios_base::floatfield);
+    cout<<"Game Over!\nHigest score is:\t"<<setw(17)<<setprecision(2)<<Setting.LargestPoint<<"\nYour score is:\t\t"<<setw(17)<<setprecision(2)<<mapping.culculatescore();
+    cout<<"\n\nNumber of cube:\t"<<mapping.score<<"\nNumber of filled lines:\t"<<unsigned(mapping.multi-1);
+    cout<<"\n\nPress any key to continue..\n\n>";
     Setting.saveSetting();
     show();
     _getch();
@@ -581,7 +585,7 @@ void start()
 }
 void shell()
 {
-    system("mode con cols=102 lines=37");
+    system("mode con cols=102 lines=38");
     Setting.readSetting();
     string s;
     cout<<"Tetris v3.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
@@ -603,7 +607,8 @@ void shell()
             cout<<"How to control?\n>\tTo use the Function Key 'left' or 'right',\n>\tor space to control the Tetris\n>\t'q': to quit the game.\n>\t'/': to draw the cube to the down.\n\n>";
         }
         else if (s=="honor") {
-            cout<<"Here are your honors:\n\tHighest Point:\t"<<Setting.LargestPoint<<"\n\tLatest Point:\t"<<Setting.LastPoint<<"\n\n>";
+            cout.setf(ios_base::fixed,ios_base::floatfield);
+            cout<<"Here are your honors:\n\tHighest score:\t"<<setw(17)<<setprecision(2)<<Setting.LargestPoint<<"\n\tLatest score:\t"<<setw(17)<<setprecision(2)<<Setting.LastPoint<<"\n\n>";
         }
         else if (s=="exit")
             continue;

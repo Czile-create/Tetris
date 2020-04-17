@@ -1,6 +1,6 @@
 /*
     Copyright (c) Purelight.Chan Zee Lok.
-    Latest Update: 2020 - 04 - 14
+    Latest Update: 2020 - 04 - 16
 */
 
 #include <iostream>
@@ -98,6 +98,7 @@ class map {
         int score;
         double multi;
         double culculatescore();
+        string behave();
 } mapping;
 
 class cube {
@@ -289,6 +290,23 @@ double map::culculatescore()
 {
     return
         (score+powf(1.1, multi))*10000/Setting.n/Setting.m/Setting.updateGap;
+}
+string map::behave()
+{
+    if (multi==1)
+        return "\033[43m  F  \033[0m";
+    switch (unsigned (score*10/(multi-1))) {
+        case 24:
+        case 25: return "\033[45;1m SSS \033[0m";
+        case 26: return "\033[41;1m S S \033[0m";
+        case 27: return "\033[41;1m  S  \033[0m";
+        case 28: return "\033[44;1m  A  \033[0m";
+        case 29: return "\033[42;1m  B  \033[0m";
+        case 30: return "\033[43;1m  C  \033[0m";
+        case 31: return "\033[43m  D  \033[0m";
+        case 32: return "\033[43m  E  \033[0m";
+        default: return "\033[43m  F  \033[0m";
+    }
 }
 
 void cube::changePosition(int t)
@@ -497,6 +515,8 @@ void cube::printinscreen()
 {
     gotoxy(hOut1, 36, -1);
     cout<<"Current Score: "<<mapping.culculatescore();
+    gotoxy(hOut1, 37, -1);
+    cout<<"Behave  Score: "<<mapping.behave();
     for (int i=0; i<4; i++) {
         gotoxy(hOut1,p[i].x,p[i].y*2);
         cout<<"\033[41m  \033[0m";
@@ -529,13 +549,14 @@ void printfailed()
     Setting.LastPoint=mapping.culculatescore();
     cout.setf(ios_base::fixed,ios_base::floatfield);
     cout<<"Game Over!\nHigest score is:\t"<<setw(17)<<setprecision(2)<<Setting.LargestPoint<<"\nYour score is:\t\t"<<setw(17)<<setprecision(2)<<mapping.culculatescore();
-    cout<<"\n\nNumber of cube:\t"<<mapping.score<<"\nNumber of filled lines:\t"<<unsigned(mapping.multi-1);
-    cout<<"\n\nPress any key to continue..\n\n>";
+    cout<<"\nBehave:\t\t\t\t"<<mapping.behave();
+    cout<<"\n\nNumber of cube:\t\t"<<setw(17)<<mapping.score<<"\nNumber of filled lines:\t"<<setw(17)<<unsigned(mapping.multi-1);
+    cout<<"\n\nPress \033[1;46m'enter'\033[0m to continue..\n\n>";
     Setting.saveSetting();
     show();
-    _getch();
+    while (_getch()!=13) ;
     system("cls");
-    cout<<"Tetris v3.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+    cout<<"Tetris v4.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
 }
 void start()
 {
@@ -585,22 +606,22 @@ void start()
 }
 void shell()
 {
-    system("mode con cols=102 lines=38");
+    system("mode con cols=102 lines=39");
     Setting.readSetting();
     string s;
-    cout<<"Tetris v3.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+    cout<<"Tetris v4.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
     do {
         cin>>s;
         if (s=="start")
             start();
         else if (s=="changeSetting") {
             Setting.changeSetting();
-            cout<<"Tetris v3.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+            cout<<"Tetris v4.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
         }
         else if (s=="showSetting")
             Setting.showSetting();
         else if (s=="about")
-            cout<<"Tetris v3.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+            cout<<"Tetris v4.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
         else if (s=="help") {
             cout<<"\nHere are commands you can use:\n>\tstart: To start the game.\n>\tshowSetting: To show Setting.\n";
             cout<<">\tchangeSetting: To change Setting.\n>\thonor: To show your honor.\n>\tabout: To show the info of author.\n>\texit: To exit the game\n\n";

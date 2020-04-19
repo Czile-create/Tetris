@@ -1,6 +1,6 @@
 /*
     Copyright (c) Purelight.Chan Zee Lok.
-    Latest Update: 2020 - 04 - 16
+    Latest Update: 2020 - 04 - 18
 */
 
 #include <iostream>
@@ -295,7 +295,16 @@ string map::behave()
 {
     if (multi==1)
         return "\033[43m  F  \033[0m";
-    switch (unsigned (score*10/(multi-1))) {
+    double extra=0;
+    for (int j=0;j<m;j++) {
+        bool sign=0;
+        for (int i=0;i<n;i++) {
+            sign=sign||v[i][j];
+            if (sign)
+                extra+=!v[i][j];
+        }
+    }
+    switch (unsigned ((score+extra/4)*100/m/(multi-1))) {
         case 24:
         case 25: return "\033[45;1m SSS \033[0m";
         case 26: return "\033[41;1m S S \033[0m";
@@ -517,10 +526,6 @@ void cube::printinscreen()
     cout<<"Current Score: "<<mapping.culculatescore();
     gotoxy(hOut1, 37, -1);
     cout<<"Behave  Score: "<<mapping.behave();
-    for (int i=0; i<4; i++) {
-        gotoxy(hOut1,p[i].x,p[i].y*2);
-        cout<<"\033[41m  \033[0m";
-    }
     for (int i=1; i<mapping.n; i++) {
         if (!cube(type1,type2,x+i,y).can()) {
             cube temp(type1,type2,x+i-1,y);
@@ -530,6 +535,10 @@ void cube::printinscreen()
             }
             break;
         }
+    }
+    for (int i=0; i<4; i++) {
+        gotoxy(hOut1,p[i].x,p[i].y*2);
+        cout<<"\033[41m  \033[0m";
     }
 }
 
@@ -556,7 +565,7 @@ void printfailed()
     show();
     while (_getch()!=13) ;
     system("cls");
-    cout<<"Tetris v4.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+    cout<<"Tetris v4.1\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
 }
 void start()
 {
@@ -609,19 +618,19 @@ void shell()
     system("mode con cols=102 lines=39");
     Setting.readSetting();
     string s;
-    cout<<"Tetris v4.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+    cout<<"Tetris v4.1\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
     do {
         cin>>s;
         if (s=="start")
             start();
         else if (s=="changeSetting") {
             Setting.changeSetting();
-            cout<<"Tetris v4.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+            cout<<"Tetris v4.1\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
         }
         else if (s=="showSetting")
             Setting.showSetting();
         else if (s=="about")
-            cout<<"Tetris v4.0\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+            cout<<"Tetris v4.1\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
         else if (s=="help") {
             cout<<"\nHere are commands you can use:\n>\tstart: To start the game.\n>\tshowSetting: To show Setting.\n";
             cout<<">\tchangeSetting: To change Setting.\n>\thonor: To show your honor.\n>\tabout: To show the info of author.\n>\texit: To exit the game\n\n";

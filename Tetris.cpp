@@ -28,6 +28,11 @@ void create(cube &);
 void start();
 void printfailed();
 int main();
+void windowsSize(int n, int m) {
+    string line = "lines=" + to_string(n);
+    string row = "cols=" + to_string(m);
+    system(("mode con "+row + " " + line).c_str());
+}
 
 /*令光标停留在x,y*/
 void gotoxy(HANDLE hOut1, int y, int x)
@@ -96,7 +101,7 @@ class map {
         bool live;
         mutex mtx;
         int score;
-        double multi;
+        double multi[4];
         double culculatescore();
         string behave();
 } mapping;
@@ -173,7 +178,7 @@ void set::readSetting()
 }
 void set::showSetting()
 {
-    cout<<"Here are your settings:\n\tLine:\t\t"<<n<<"\n\tList:\t\t"<<m<<"\n\tUpdateGap:\t"<<updateGap<<"\n\n>";
+    cout<<"Rows:\t"<<n<<"\nCols:\t"<<m<<"\nUpdateGap:\t"<<updateGap<<"\n\n>";
 }
 void set::saveSetting()
 {
@@ -184,6 +189,7 @@ void set::saveSetting()
 
 void set::changeSetting()
 {
+    windowsSize(39, 102);
     string s="";
     int temp=0;
     while (s!="save") {
@@ -219,6 +225,7 @@ void set::changeSetting()
             cout<<"Command NOT Found! Please try again.\n";
         saveSetting();
     }
+    windowsSize(Setting.n+9, 2*Setting.m+2);
 }
 
 int set::culculateVerify()
@@ -248,7 +255,7 @@ void map::init()
             v[i][j]=0;
     score=0;
     live=1;
-    multi=1;
+    multi[0] = multi[1] = multi[2] = multi[3] = 0;
 }
 void map::printinmap(cube * t)
 {
@@ -261,14 +268,14 @@ void map::printinmap(cube * t)
 void map::check(cube * t)
 {
     score++;
-    int sum;
+    int sum, z = 0;
     for (int q=0; q<4; q++) {
         sum=0;
         int i=t->p[q].x;
         for (int j=0; j<m; j++)
             sum+=v[i][j];
         if (sum==m) {
-            multi+=1;
+            ++ multi[z++];
             for (int k=i; k>0; k--)
                 for (int l=0; l<m; l++) {
                     v[k][l]=v[k-1][l];
@@ -289,11 +296,12 @@ void map::check(cube * t)
 double map::culculatescore()
 {
     return
-        (score+powf(1.1, multi))*10000/Setting.n/Setting.m/Setting.updateGap;
+        (10 * multi[0] + 20 * multi[1] + 40 * multi[2] + 100 * multi[3] + score) * 1000
+            * Setting.m / Setting.n / Setting.updateGap;
 }
 string map::behave()
 {
-    if (multi==1)
+    if (multi[0]==0)
         return "\033[43m  F  \033[0m";
     double extra=0;
     for (int j=0;j<m;j++) {
@@ -304,7 +312,7 @@ string map::behave()
                 extra+=!v[i][j];
         }
     }
-    switch (unsigned ((score+extra/4)*100/m/(multi-1))) {
+    switch (unsigned ((score+extra/4)*100/m/(multi[0]-1))) {
         case 24:
         case 25: return "\033[45;1m SSS \033[0m";
         case 26: return "\033[41;1m S S \033[0m";
@@ -557,15 +565,22 @@ void printfailed()
         Setting.LargestPoint=mapping.culculatescore();
     Setting.LastPoint=mapping.culculatescore();
     cout.setf(ios_base::fixed,ios_base::floatfield);
-    cout<<"Game Over!\nHigest score is:\t"<<setw(17)<<setprecision(2)<<Setting.LargestPoint<<"\nYour score is:\t\t"<<setw(17)<<setprecision(2)<<mapping.culculatescore();
-    cout<<"\nBehave:\t\t\t\t"<<mapping.behave();
-    cout<<"\n\nNumber of cube:\t\t"<<setw(17)<<mapping.score<<"\nNumber of filled lines:\t"<<setw(17)<<unsigned(mapping.multi-1);
-    cout<<"\n\nPress \033[1;46m'enter'\033[0m to continue..\n\n>";
+    for (auto i = 0; 2 * i < Setting.m - 10; ++i)
+        cout << " ";
+    cout<<"Game Over!\n";
+    for (auto i = 0; i < Setting.m * 2 + 2; ++i)
+        cout << '=';
+    cout << "\nRecord:\t"<<setprecision(2)<<Setting.LargestPoint<<"\nScore:\t"<<setprecision(2)<<mapping.culculatescore();
+    cout<<"\nBehave:\t"<<mapping.behave();
+    cout<<"\n\nCube:\t\t"<<mapping.score<<"\n1x lines:\t"<<unsigned(mapping.multi[0])
+        <<"\n2x lines:\t"<<unsigned(mapping.multi[1])<<"\n3x lines:\t"<<unsigned(mapping.multi[2])
+        <<"\n4x lines:\t"<<unsigned(mapping.multi[3]);
+    cout<<"\n\nPress \033[1;46m'enter'\033[0m\nto continue..\n\n>";
     Setting.saveSetting();
     show();
     while (_getch()!=13) ;
     system("cls");
-    cout<<"Tetris v4.1\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+    cout<<"Tetris v5.0\nCopyright (c) Czile.\n\nPlease enter \033[1;46m'start'\033[0m\nto start game..\n\n>";
 }
 void start()
 {
@@ -615,30 +630,28 @@ void start()
 }
 void shell()
 {
-    system("mode con cols=102 lines=39");
     Setting.readSetting();
+    windowsSize(Setting.n+9, 2*Setting.m+2);
     string s;
-    cout<<"Tetris v4.1\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+    cout<<"Tetris v5.0\nCopyright (c) Czile.\n\nPlease enter \033[1;46m'start'\033[0m\nto start game..\n\n>";
     do {
         cin>>s;
         if (s=="start")
             start();
         else if (s=="changeSetting") {
             Setting.changeSetting();
-            cout<<"Tetris v4.1\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
-        }
+            cout<<"Tetris v5.0\nCopyright (c) Czile.\n\nPlease enter \033[1;46m'start'\033[0m\nto start game..\n\n>";        }
         else if (s=="showSetting")
             Setting.showSetting();
         else if (s=="about")
-            cout<<"Tetris v4.1\nCopyright (c) 2020 Purelight.Chan Zee Lok.\nPlease enter \033[1;46m'start'\033[0m to start..\n\n>";
+            cout<<"Tetris v5.0\nCopyright (c) Czile.\n\nPlease enter \033[1;46m'start'\033[0m\nto start game..\n\n>";        
         else if (s=="help") {
-            cout<<"\nHere are commands you can use:\n>\tstart: To start the game.\n>\tshowSetting: To show Setting.\n";
-            cout<<">\tchangeSetting: To change Setting.\n>\thonor: To show your honor.\n>\tabout: To show the info of author.\n>\texit: To exit the game\n\n";
-            cout<<"How to control?\n>\tTo use the Function Key 'left' or 'right',\n>\tor space to control the Tetris\n>\t'q': to quit the game.\n>\t'/': to draw the cube to the down.\n\n>";
+            cout<<"Command:\n\tstart\n\tshowSetting\n\tchangeSetting\n\thonor\n\tabout\n\texit\n\n";
+            cout<<"Control:\n\tleft, right\n\tspace, /, q\n\n>";
         }
         else if (s=="honor") {
             cout.setf(ios_base::fixed,ios_base::floatfield);
-            cout<<"Here are your honors:\n\tHighest score:\t"<<setw(17)<<setprecision(2)<<Setting.LargestPoint<<"\n\tLatest score:\t"<<setw(17)<<setprecision(2)<<Setting.LastPoint<<"\n\n>";
+            cout<<"Record\t"<<setprecision(2)<<Setting.LargestPoint<<"\nLatest:\t"<<setprecision(2)<<Setting.LastPoint<<"\n\n>";
         }
         else if (s=="exit")
             continue;

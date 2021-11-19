@@ -296,8 +296,8 @@ void map::check(cube * t)
 double map::culculatescore()
 {
     return
-        (10 * multi[0] + 20 * multi[1] + 40 * multi[2] + 100 * multi[3] + score) * 1000
-            * Setting.m / Setting.n / Setting.updateGap;
+        (10 * multi[0] + 50 * pow(multi[1], 2) + 200 * pow(multi[2], 3)) * pow(1.5, multi[3]) * 1000
+            * Setting.m / pow(1.7, (Setting.n-10)/2) / Setting.updateGap;
 }
 string map::behave()
 {
@@ -312,16 +312,18 @@ string map::behave()
                 extra+=!v[i][j];
         }
     }
-    switch (unsigned ((score+extra/4)*100/m/(multi[0]-1))) {
-        case 24:
-        case 25: return "\033[45;1m SSS \033[0m";
-        case 26: return "\033[41;1m S S \033[0m";
-        case 27: return "\033[41;1m  S  \033[0m";
-        case 28: return "\033[44;1m  A  \033[0m";
-        case 29: return "\033[42;1m  B  \033[0m";
-        case 30: return "\033[43;1m  C  \033[0m";
-        case 31: return "\033[43m  D  \033[0m";
-        case 32: return "\033[43m  E  \033[0m";
+    switch (min(int(
+        log(mapping.culculatescore())/1.25 + (2 * multi[1] + 3 * multi[2] + 4 * multi[3])/multi[0]
+    ), 9)) {
+        case 9:
+        case 8: return "\033[45;1m SSS \033[0m";
+        case 7: return "\033[41;1m S S \033[0m";
+        case 6: return "\033[41;1m  S  \033[0m";
+        case 5: return "\033[44;1m  A  \033[0m";
+        case 4: return "\033[42;1m  B  \033[0m";
+        case 3: return "\033[43;1m  C  \033[0m";
+        case 2: return "\033[43m  D  \033[0m";
+        case 1: return "\033[43m  E  \033[0m";
         default: return "\033[43m  F  \033[0m";
     }
 }
@@ -530,10 +532,10 @@ void cube::moveinscreen()
 }
 void cube::printinscreen()
 {
-    gotoxy(hOut1, 36, -1);
-    cout<<"Current Score: "<<mapping.culculatescore();
-    gotoxy(hOut1, 37, -1);
-    cout<<"Behave  Score: "<<mapping.behave();
+    gotoxy(hOut1, Setting.n+6, -1);
+    cout<<"Score:  "<<fixed<<setw(2*Setting.m+2 - 8)<<setprecision(2)<<mapping.culculatescore();
+    gotoxy(hOut1, Setting.n+7, -1);
+    cout<<"Behave: "<<string(2*Setting.m+2 - 13, ' ')<<mapping.behave();
     for (int i=1; i<mapping.n; i++) {
         if (!cube(type1,type2,x+i,y).can()) {
             cube temp(type1,type2,x+i-1,y);
@@ -555,7 +557,9 @@ void autodown(cube & p)
 {
     while (mapping.live) {
         p.changePosition(3);
-        Sleep(Setting.updateGap);
+        Sleep(Setting.updateGap - min(int(Setting.updateGap / 5), 
+            int(log(Setting.updateGap) * 3)
+        ));
     }
 }
 void printfailed()
@@ -565,16 +569,15 @@ void printfailed()
         Setting.LargestPoint=mapping.culculatescore();
     Setting.LastPoint=mapping.culculatescore();
     cout.setf(ios_base::fixed,ios_base::floatfield);
-    for (auto i = 0; 2 * i < Setting.m - 10; ++i)
-        cout << " ";
-    cout<<"Game Over!\n";
-    for (auto i = 0; i < Setting.m * 2 + 2; ++i)
-        cout << '=';
-    cout << "\nRecord:\t"<<setprecision(2)<<Setting.LargestPoint<<"\nScore:\t"<<setprecision(2)<<mapping.culculatescore();
-    cout<<"\nBehave:\t"<<mapping.behave();
-    cout<<"\n\nCube:\t\t"<<mapping.score<<"\n1x lines:\t"<<unsigned(mapping.multi[0])
-        <<"\n2x lines:\t"<<unsigned(mapping.multi[1])<<"\n3x lines:\t"<<unsigned(mapping.multi[2])
-        <<"\n4x lines:\t"<<unsigned(mapping.multi[3]);
+    cout<<string(Setting.m - 4, ' ')<<"Game Over!\n" << string(2*Setting.m+2, '=');
+    cout << "\nRecord:"<<setw(2*Setting.m+2 - 7)<<setprecision(2)<<Setting.LargestPoint
+         <<"\nScore:"<<setw(2*Setting.m+2-6)<<setprecision(2)<<mapping.culculatescore();
+    cout<<"\nBehave:"<<string(2*Setting.m+2 - 12, ' ')<<mapping.behave();
+    cout<<"\n\nCube:"<<setw(2*Setting.m+2-5)<<mapping.score
+        <<"\n1x lines:"<<setw(2*Setting.m+2-9)<<unsigned(mapping.multi[0])
+        <<"\n2x lines:"<<setw(2*Setting.m+2-9)<<unsigned(mapping.multi[1])
+        <<"\n3x lines:"<<setw(2*Setting.m+2-9)<<unsigned(mapping.multi[2])
+        <<"\n4x lines:"<<setw(2*Setting.m+2-9)<<unsigned(mapping.multi[3]);
     cout<<"\n\nPress \033[1;46m'enter'\033[0m\nto continue..\n\n>";
     Setting.saveSetting();
     show();

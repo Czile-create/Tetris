@@ -10,9 +10,9 @@ For those who cannot compile C++ files, see our [release files](https://github.c
 > Pics follows may NOT screenshots of the latest version.  
 > 下列图片可能不是最新版本
 
-![Cover](https://github.com/Czile-create/Tetris/tree/master/TetrisPics/6.png)  
-![Game](https://github.com/Czile-create/Tetris/tree/master/TetrisPics/4.png)  
-![Game Over](https://github.com/Czile-create/Tetris/tree/master/TetrisPics/5.png)  
+![Cover](https://github.com/Czile-create/Tetris/tree/master/TetrisPics/6.jpg)  
+![Game](https://github.com/Czile-create/Tetris/tree/master/TetrisPics/4.jpg)  
+![Game Over](https://github.com/Czile-create/Tetris/tree/master/TetrisPics/5.jpg)  
 
 ## How to use? 使用方法
 **重要：在游戏反应页面中键入 `start` 即可开始游戏。**

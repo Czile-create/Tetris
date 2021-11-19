@@ -62,7 +62,7 @@ class set {
         {
             updateGap=300;
             LargestPoint=0;
-            n=30;
+            n=15;
             m=10;
             LastPoint=0;
         }
@@ -296,8 +296,8 @@ void map::check(cube * t)
 double map::culculatescore()
 {
     return
-        (10 * multi[0] + 50 * pow(multi[1], 2) + 200 * pow(multi[2], 3)) * pow(1.5, multi[3]) * 1000
-            * Setting.m / pow(1.7, (Setting.n-10)/2) / Setting.updateGap;
+        (10 * multi[0] + 50 * pow(multi[1], 2) + 200 * pow(multi[2], 3)) * pow(1.5, multi[3]) * 100
+            * Setting.m / (Setting.n-9) / Setting.updateGap;
 }
 string map::behave()
 {
